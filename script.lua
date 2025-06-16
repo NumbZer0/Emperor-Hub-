@@ -1,70 +1,20 @@
--- Proteção contra :Kick()
+-- 🛡️ Bypass Kick
 local mt = getrawmetatable(game)
 setreadonly(mt, false)
 
 local oldNamecall = mt.__namecall
-local oldIndex = mt.__index
 
-mt.__namecall = function(self, ...)
-    local method = getnamecallmethod()
-    local args = {...}
-
-    if (method == "Kick" or tostring(method):lower() == "kick") and self == game.Players.LocalPlayer then
-        warn("[Bypass] Tentaram te kickar pelo Namecall, bloqueado 😎")
-        return
-    end
-
-    -- Bloqueia tentativas de Remote Kick disfarçado
-    if (method == "FireServer" or method == "InvokeServer") and tostring(self):lower():find("kick") then
-        warn("[Bypass] Remote suspeito de Kick bloqueado:", self:GetFullName())
-        return
-    end
-
-    return oldNamecall(self, unpack(args))
-end
-
-mt.__index = function(self, key)
-    if key == "Kick" and self == game.Players.LocalPlayer then
-        warn("[Bypass] Tentaram acessar Kick pelo __index, bloqueado 😎")
-        return function() return end
-    end
-    return oldIndex(self, key)
-end
-
-setreadonly(mt, true)
-
--- Proteção contra erros forçados
-local oldError = error
-error = function(msg, ...)
-    if tostring(msg):lower():find("kick") or tostring(msg):lower():find("ban") then
-        warn("[Bypass] Tentaram forçar erro de kick:", msg)
-        return
-    end
-    return oldError(msg, ...)
-end
-
--- Proteção contra Crashes intencionais
-game:GetService("Players").LocalPlayer.DescendantRemoving:Connect(function(obj)
-    if obj:IsA("Humanoid") then
-        warn("[Bypass] Tentaram remover seu Humanoid pra crashar/kickar, revertendo 😎")
-        obj:Clone().Parent = game.Players.LocalPlayer.Character
-    end
-end)
-local mt = getrawmetatable(game)
-local oldNamecall = mt.__namecall
-setreadonly(mt, false)
 mt.__namecall = newcclosure(function(self, ...)
     local method = getnamecallmethod()
-    local args = {...}
-    if method == "Kick" then
-        return wait(9e9) -- bloqueia kick
+    if tostring(method) == "Kick" then
+        return warn("[EmperorHub] Kick bloqueado 😎")
     end
-    if tostring(self) == "KickEvent" then
-        return wait(9e9) -- bloqueia kick remoto
-    end
-    return oldNamecall(self, unpack(args))
+    return oldNamecall(self, ...)
 end)
+
 setreadonly(mt, true)
+
+print("[EmperorHub] Kick Bypass Ativado ✅")
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
