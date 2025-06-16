@@ -1,4 +1,3 @@
--- 🛡️ Bypass Kick
 local mt = getrawmetatable(game)
 setreadonly(mt, false)
 
