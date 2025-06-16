@@ -1,20 +1,3 @@
-local mt = getrawmetatable(game)
-setreadonly(mt, false)
-
-local oldNamecall = mt.__namecall
-
-mt.__namecall = newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    if tostring(method) == "Kick" then
-        return warn("[EmperorHub] Kick bloqueado 😎")
-    end
-    return oldNamecall(self, ...)
-end)
-
-setreadonly(mt, true)
-
-print("[EmperorHub] Kick Bypass Ativado ✅")
-
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
