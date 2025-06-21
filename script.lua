@@ -1,27 +1,26 @@
--- Serviços
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local ClipboardService = setclipboard or toclipboard or (Clipboard and Clipboard.set)
 
--- Remover UI antiga
-local oldGui = PlayerGui:FindFirstChild("EmperorHub")
+-- Remove UI antiga
+local oldGui = PlayerGui:FindFirstChild("soyguhMOD")
 if oldGui then oldGui:Destroy() end
 
--- Criar GUI
-local gui = Instance.new("ScreenGui")
-gui.Name = "EmperorHub"
-gui.ResetOnSpawn = false
-gui.Parent = PlayerGui
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "soyguhMOD"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = PlayerGui
 
--- Função de Drag
+-- Função de arrastar
 local function makeDraggable(frame)
-    local dragging, dragInput, dragStart, startPos
+    local dragging = false
+    local dragInput, dragStart, startPos
 
     frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
@@ -35,7 +34,7 @@ local function makeDraggable(frame)
     end)
 
     frame.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
             dragInput = input
         end
     end)
@@ -44,133 +43,135 @@ local function makeDraggable(frame)
         if input == dragInput and dragging then
             local delta = input.Position - dragStart
             local screenSize = workspace.CurrentCamera.ViewportSize
-            local newPos = UDim2.new(
-                startPos.X.Scale + delta.X / screenSize.X,
-                startPos.X.Offset,
-                startPos.Y.Scale + delta.Y / screenSize.Y,
-                startPos.Y.Offset
-            )
-            frame.Position = newPos
+            local newX = startPos.X.Scale + delta.X / screenSize.X
+            local newY = startPos.Y.Scale + delta.Y / screenSize.Y
+
+            local frameSize = frame.Size
+            local maxX = 1 - frameSize.X.Scale
+            local maxY = 1 - frameSize.Y.Scale
+
+            newX = math.clamp(newX, 0, maxX)
+            newY = math.clamp(newY, 0, maxY)
+
+            frame.Position = UDim2.new(newX, 0, newY, 0)
         end
     end)
 end
 
--- Main Frame
-local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 350, 0, 250)
-main.Position = UDim2.new(0.5, -175, 0.5, -125)
-main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-main.Parent = gui
-main.Visible = true
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 15)
+-- UI Principal
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 350, 0, 250)
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -125)
+mainFrame.BackgroundColor3 = Color3.new(0,0,0)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+mainFrame.Active = true
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 15)
 
-local stroke = Instance.new("UIStroke", main)
-stroke.Thickness = 4
-stroke.Color = Color3.new(0,0,0)
-
--- Wallpaper
-local wallpaper = Instance.new("ImageLabel", main)
+local wallpaper = Instance.new("ImageLabel")
+wallpaper.Parent = mainFrame
 wallpaper.Size = UDim2.new(1, -10, 1, -10)
 wallpaper.Position = UDim2.new(0, 5, 0, 5)
 wallpaper.BackgroundTransparency = 1
 wallpaper.Image = "rbxassetid://110536188881147"
 wallpaper.ImageTransparency = 0.5
+wallpaper.ScaleType = Enum.ScaleType.Fit
 Instance.new("UICorner", wallpaper).CornerRadius = UDim.new(0, 15)
 
--- Inner Frame
-local inner = Instance.new("Frame", main)
-inner.Size = UDim2.new(1, -10, 1, -10)
-inner.Position = UDim2.new(0, 5, 0, 5)
-inner.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-inner.BackgroundTransparency = 0.7
-Instance.new("UICorner", inner).CornerRadius = UDim.new(0, 15)
+local innerFrame = Instance.new("Frame")
+innerFrame.Parent = mainFrame
+innerFrame.Size = UDim2.new(1, -10, 1, -10)
+innerFrame.Position = UDim2.new(0, 5, 0, 5)
+innerFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+innerFrame.BackgroundTransparency = 0.7
+innerFrame.BorderSizePixel = 0
+Instance.new("UICorner", innerFrame).CornerRadius = UDim.new(0, 15)
 
--- Logo no canto
-local logo = Instance.new("ImageLabel", inner)
+-- Logo pequena no canto
+local logo = Instance.new("ImageLabel")
+logo.Parent = innerFrame
 logo.Size = UDim2.new(0, 30, 0, 30)
 logo.Position = UDim2.new(0, 10, 0, 5)
 logo.BackgroundTransparency = 1
 logo.Image = "rbxassetid://110536188881147"
 logo.ScaleType = Enum.ScaleType.Fit
 
--- Title
-local title = Instance.new("TextLabel", inner)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Position = UDim2.new(0, 0, 0, 0)
+-- Título
+local title = Instance.new("TextLabel")
+title.Parent = innerFrame
+title.Size = UDim2.new(1, -50, 0, 30)
+title.Position = UDim2.new(0, 45, 0, 5)
 title.BackgroundTransparency = 1
-title.Text = "Emperor Hub"
 title.Font = Enum.Font.GothamBold
-title.TextColor3 = Color3.new(1,1,1)
 title.TextSize = 24
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Text = "Emperor Hub"
 title.TextXAlignment = Enum.TextXAlignment.Left
-title.Position = UDim2.new(0, 45, 0, 0)
 
 -- Tabs
-local tabs = Instance.new("Frame", inner)
-tabs.Size = UDim2.new(1, -20, 0, 35)
-tabs.Position = UDim2.new(0, 10, 0, 45)
-tabs.BackgroundTransparency = 1
+local tabButtons = Instance.new("Frame")
+tabButtons.Parent = innerFrame
+tabButtons.Size = UDim2.new(1, -20, 0, 35)
+tabButtons.Position = UDim2.new(0, 10, 0, 45)
+tabButtons.BackgroundTransparency = 1
 
-local stylesBtn = Instance.new("TextButton", tabs)
-stylesBtn.Size = UDim2.new(0.5, -5, 1, 0)
-stylesBtn.Position = UDim2.new(0, 0, 0, 0)
-stylesBtn.Text = "Estilos"
-stylesBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-stylesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-stylesBtn.Font = Enum.Font.GothamBold
-stylesBtn.TextSize = 18
-Instance.new("UICorner", stylesBtn).CornerRadius = UDim.new(0, 15)
+local stylesTabButton = Instance.new("TextButton")
+stylesTabButton.Parent = tabButtons
+stylesTabButton.Size = UDim2.new(0.5, -5, 1, 0)
+stylesTabButton.Position = UDim2.new(0, 0, 0, 0)
+stylesTabButton.Text = "Estilos"
+stylesTabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+stylesTabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+stylesTabButton.Font = Enum.Font.GothamBold
+stylesTabButton.TextSize = 18
+Instance.new("UICorner", stylesTabButton).CornerRadius = UDim.new(0, 15)
 
-local playerBtn = stylesBtn:Clone()
-playerBtn.Parent = tabs
-playerBtn.Position = UDim2.new(0.5, 5, 0, 0)
-playerBtn.Text = "Jogador"
+local vulnTabButton = stylesTabButton:Clone()
+vulnTabButton.Parent = tabButtons
+vulnTabButton.Position = UDim2.new(0.5, 5, 0, 0)
+vulnTabButton.Text = "Jogador"
 
--- Frames das abas
-local stylesTab = Instance.new("Frame", inner)
+-- Styles Tab
+local stylesTab = Instance.new("Frame")
+stylesTab.Parent = innerFrame
 stylesTab.Size = UDim2.new(1, -20, 1, -90)
 stylesTab.Position = UDim2.new(0, 10, 0, 85)
 stylesTab.BackgroundTransparency = 1
-stylesTab.Visible = true
 
-local playerTab = stylesTab:Clone()
-playerTab.Parent = inner
-playerTab.Visible = false
-
--- Função botão externo (Noel e Nel Rin)
-local function createExternalStyleButton(parent, name, key, scriptURL, color, textColor, posY, isRGB)
-    local btn = Instance.new("TextButton", parent)
+-- Função criar botão externo
+local function createExternalStyleButton(parent, name, key, scriptUrl, bgColor, textColor, posY, rgb)
+    local btn = Instance.new("TextButton")
+    btn.Parent = parent
     btn.Size = UDim2.new(1, 0, 0, 40)
     btn.Position = UDim2.new(0, 0, 0, posY)
-    btn.BackgroundColor3 = color
+    btn.BackgroundColor3 = bgColor
     btn.TextColor3 = textColor
     btn.Font = Enum.Font.GothamBold
     btn.TextSize = 20
     btn.Text = name
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 15)
 
-    if isRGB then
-        task.spawn(function()
-            local hue = 0
-            while task.wait() do
-                hue = (hue + 1) % 360
-                btn.BackgroundColor3 = Color3.fromHSV(hue/360, 1, 1)
-            end
+    if rgb then
+        local hue = 0
+        RunService.Heartbeat:Connect(function(dt)
+            hue = (hue + dt * 60) % 360
+            local color = Color3.fromHSV(hue / 360, 1, 1)
+            btn.BackgroundColor3 = color
         end)
     end
 
     btn.MouseButton1Click:Connect(function()
-        if ClipboardService then ClipboardService(key) end
-        loadstring(game:HttpGet(scriptURL))()
+        setclipboard(key)
+        loadstring(game:HttpGet(scriptUrl))()
         game.StarterGui:SetCore("SendNotification", {
             Title = "Emperor Hub",
-            Text = "Key copiada e script de "..name.." executado 🔥",
+            Text = "Key copiada para área de transferência!",
             Duration = 3
         })
     end)
 end
 
--- Criar botões estilos
 createExternalStyleButton(stylesTab, "Noel Noa", "BESTNOEL",
     "https://raw.githubusercontent.com/stylemakeritosh/Ace/refs/heads/main/NoelNoaV1",
     Color3.fromRGB(0,0,0), Color3.fromRGB(255,255,255), 0, true)
@@ -179,52 +180,78 @@ createExternalStyleButton(stylesTab, "NEL Rin V2", "Nelrinv2upd",
     "https://raw.githubusercontent.com/stylemakeritosh/Ace/refs/heads/main/NelRinV2",
     Color3.fromRGB(255,255,255), Color3.fromRGB(0,100,0), 50, false)
 
+createExternalStyleButton(stylesTab, "REO's Custom", "BESTCHANGER",
+    "https://raw.githubusercontent.com/stylemakeritosh/Menu/refs/heads/main/Stylechanger",
+    Color3.fromRGB(100,100,255), Color3.fromRGB(255,255,255), 100, false)
+
+-- VULN Tab
+local vulnTab = Instance.new("Frame")
+vulnTab.Parent = innerFrame
+vulnTab.Size = stylesTab.Size
+vulnTab.Position = stylesTab.Position
+vulnTab.BackgroundTransparency = 1
+vulnTab.Visible = false
+
 -- Inf Stamina
 local infStamina = false
-local staminaBtn = Instance.new("TextButton", playerTab)
-staminaBtn.Size = UDim2.new(1, 0, 0, 40)
-staminaBtn.Position = UDim2.new(0, 0, 0, 0)
-staminaBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-staminaBtn.TextColor3 = Color3.new(1,1,1)
-staminaBtn.Font = Enum.Font.GothamBold
-staminaBtn.TextSize = 20
-staminaBtn.Text = "Inf Stamina [OFF]"
-Instance.new("UICorner", staminaBtn).CornerRadius = UDim.new(0, 15)
+local infStaminaConnection = nil
 
-local staminaConnection
-staminaBtn.MouseButton1Click:Connect(function()
+local infStaminaBtn = Instance.new("TextButton")
+infStaminaBtn.Parent = vulnTab
+infStaminaBtn.Size = UDim2.new(1, 0, 0, 40)
+infStaminaBtn.Position = UDim2.new(0, 0, 0, 0)
+infStaminaBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+infStaminaBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+infStaminaBtn.Font = Enum.Font.GothamBold
+infStaminaBtn.TextSize = 20
+infStaminaBtn.Text = "Inf Stamina [OFF]"
+Instance.new("UICorner", infStaminaBtn).CornerRadius = UDim.new(0, 15)
+
+infStaminaBtn.MouseButton1Click:Connect(function()
     infStamina = not infStamina
     if infStamina then
-        staminaBtn.Text = "Inf Stamina [ON]"
-        staminaBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
-        staminaConnection = RunService.Heartbeat:Connect(function()
-            local stamina = LocalPlayer.PlayerStats:FindFirstChild("Stamina")
-            if stamina then stamina.Value = 100 end
+        infStaminaBtn.Text = "Inf Stamina [ON]"
+        infStaminaBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+        infStaminaConnection = RunService.Heartbeat:Connect(function()
+            pcall(function()
+                local stamina = LocalPlayer.PlayerStats:FindFirstChild("Stamina")
+                if stamina and stamina:IsA("NumberValue") then
+                    stamina.Value = 100
+                end
+            end)
         end)
     else
-        staminaBtn.Text = "Inf Stamina [OFF]"
-        staminaBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        if staminaConnection then staminaConnection:Disconnect() end
+        infStaminaBtn.Text = "Inf Stamina [OFF]"
+        infStaminaBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        if infStaminaConnection then
+            infStaminaConnection:Disconnect()
+            infStaminaConnection = nil
+        end
     end
 end)
 
 -- No Cooldown
-local noCooldownBtn = staminaBtn:Clone()
-noCooldownBtn.Parent = playerTab
+local noCooldownBtn = Instance.new("TextButton")
+noCooldownBtn.Parent = vulnTab
+noCooldownBtn.Size = UDim2.new(1, 0, 0, 40)
 noCooldownBtn.Position = UDim2.new(0, 0, 0, 50)
-noCooldownBtn.Text = "No Cooldown"
 noCooldownBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+noCooldownBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+noCooldownBtn.Font = Enum.Font.GothamBold
+noCooldownBtn.TextSize = 20
+noCooldownBtn.Text = "No Cooldown"
+Instance.new("UICorner", noCooldownBtn).CornerRadius = UDim.new(0, 15)
 
 noCooldownBtn.MouseButton1Click:Connect(function()
     for i,v in pairs(getgc(true)) do
         if typeof(v) == "table" then
-            for k,b in pairs(v) do
-                if tostring(k):lower():find("cooldown") then
-                    if typeof(b) == "number" and b > 0 then
-                        v[k] = 0
+            for key,value in pairs(v) do
+                if tostring(key):lower():find("cooldown") then
+                    if typeof(value) == "number" and value > 0 then
+                        v[key] = 0
                     end
-                    if typeof(b) == "function" then
-                        v[k] = function() return 0 end
+                    if typeof(value) == "function" then
+                        v[key] = function(...) return 0 end
                     end
                 end
             end
@@ -232,39 +259,45 @@ noCooldownBtn.MouseButton1Click:Connect(function()
     end
     game.StarterGui:SetCore("SendNotification", {
         Title = "Emperor Hub",
-        Text = "Cooldown Zerado 🔥",
+        Text = "Cooldown de Skills Desativado 😈!",
         Duration = 3
     })
 end)
 
--- Troca de abas
-stylesBtn.MouseButton1Click:Connect(function()
+-- Sistema de abas
+stylesTabButton.MouseButton1Click:Connect(function()
     stylesTab.Visible = true
-    playerTab.Visible = false
-    stylesBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-    playerBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    vulnTab.Visible = false
+    stylesTabButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    vulnTabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 end)
 
-playerBtn.MouseButton1Click:Connect(function()
+vulnTabButton.MouseButton1Click:Connect(function()
     stylesTab.Visible = false
-    playerTab.Visible = true
-    stylesBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    playerBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    vulnTab.Visible = true
+    stylesTabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    vulnTabButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 end)
 
 -- Toggle UI
-local toggleFrame = Instance.new("Frame", gui)
+local toggleFrame = Instance.new("Frame")
+toggleFrame.Name = "ToggleFrame"
 toggleFrame.Size = UDim2.new(0, 60, 0, 28)
 toggleFrame.Position = UDim2.new(0, 20, 0, 20)
 toggleFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+toggleFrame.BorderSizePixel = 0
+toggleFrame.Parent = screenGui
+toggleFrame.Active = true
 Instance.new("UICorner", toggleFrame).CornerRadius = UDim.new(0, 14)
 
-local switchBtn = Instance.new("Frame", toggleFrame)
+local switchBtn = Instance.new("Frame")
+switchBtn.Parent = toggleFrame
 switchBtn.Size = UDim2.new(1, 0, 1, 0)
 switchBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 Instance.new("UICorner", switchBtn).CornerRadius = UDim.new(0, 14)
 
-local toggleCircle = Instance.new("Frame", switchBtn)
+local toggleCircle = Instance.new("Frame")
+toggleCircle.Parent = switchBtn
 toggleCircle.Size = UDim2.new(0, 26, 0, 26)
 toggleCircle.Position = UDim2.new(0, 2, 0, 1)
 toggleCircle.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
@@ -275,11 +308,11 @@ local function updateToggle()
     if uiVisible then
         switchBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
         toggleCircle:TweenPosition(UDim2.new(1, -28, 0, 1), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3, true)
-        main.Visible = true
+        mainFrame.Visible = true
     else
         switchBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         toggleCircle:TweenPosition(UDim2.new(0, 2, 0, 1), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3, true)
-        main.Visible = false
+        mainFrame.Visible = false
     end
 end
 
@@ -290,8 +323,8 @@ switchBtn.InputBegan:Connect(function(input)
     end
 end)
 
--- Ativar drag
-makeDraggable(main)
+-- Ativa Drag
+makeDraggable(mainFrame)
 makeDraggable(toggleFrame)
 
 updateToggle()
